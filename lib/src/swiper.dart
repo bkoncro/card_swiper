@@ -1025,7 +1025,8 @@ class _StackViewState extends _CustomLayoutStateBase<_StackSwiper> {
   }
 }
 
-class _StackReverseViewState extends _CustomLayoutStateBase<_StackSwiper> {
+class _StackReverseViewState
+    extends _CustomLayoutStateBase<_StackReverseSwiper> {
   late List<double> scales;
   late List<double> offsets;
   late List<double> opacity;
@@ -1048,7 +1049,7 @@ class _StackReverseViewState extends _CustomLayoutStateBase<_StackSwiper> {
   }
 
   @override
-  void didUpdateWidget(_StackSwiper oldWidget) {
+  void didUpdateWidget(_StackReverseSwiper oldWidget) {
     _updateValues();
     super.didUpdateWidget(oldWidget);
   }
