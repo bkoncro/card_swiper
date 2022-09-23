@@ -10,10 +10,12 @@ abstract class _CustomLayoutStateBase<T extends _SubSwiper> extends State<T>
   late int _startIndex;
   int? _animationCount;
   int _currentIndex = 0;
+  late bool _reversePan;
 
   @override
   void initState() {
     _currentIndex = widget.index ?? 0;
+    _reversePan = widget.reversePan;
     if (widget.itemWidth == null) {
       throw Exception(
         '==============\n\nwidget.itemWidth must not be null when use stack layout.\n========\n',
@@ -214,12 +216,20 @@ abstract class _CustomLayoutStateBase<T extends _SubSwiper> extends State<T>
       if (_currentIndex <= 0 && !widget.loop) {
         return;
       }
-      _move(1.0, nextIndex: _currentIndex - 1);
+      if (_reversePan) {
+        _move(0.0, nextIndex: _currentIndex + 1);
+      } else {
+        _move(1.0, nextIndex: _currentIndex - 1);
+      }
     } else if (_animationController.value < 0.25 || velocity < -500.0) {
       if (_currentIndex >= widget.itemCount - 1 && !widget.loop) {
         return;
       }
-      _move(0.0, nextIndex: _currentIndex + 1);
+      if (_reversePan) {
+        _move(1.0, nextIndex: _currentIndex - 1);
+      } else {
+        _move(0.0, nextIndex: _currentIndex + 1);
+      }
     } else {
       _move(0.5);
     }
@@ -235,13 +245,24 @@ abstract class _CustomLayoutStateBase<T extends _SubSwiper> extends State<T>
 
   void _onPanUpdate(DragUpdateDetails details) {
     if (_lockScroll) return;
-    var value = _currentValue +
-        ((widget.scrollDirection == Axis.horizontal
-                    ? details.globalPosition.dx
-                    : details.globalPosition.dy) -
-                _currentPos) /
-            _swiperWidth /
-            2;
+    late double value;
+    if (_reversePan) {
+      value = _currentValue -
+          ((widget.scrollDirection == Axis.horizontal
+                      ? details.globalPosition.dx
+                      : details.globalPosition.dy) -
+                  _currentPos) /
+              _swiperWidth /
+              2;
+    } else {
+      value = _currentValue +
+          ((widget.scrollDirection == Axis.horizontal
+                      ? details.globalPosition.dx
+                      : details.globalPosition.dy) -
+                  _currentPos) /
+              _swiperWidth /
+              2;
+    }
     // no loop ?
     if (!widget.loop) {
       if (_currentIndex >= widget.itemCount - 1) {
